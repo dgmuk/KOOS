@@ -14,6 +14,20 @@
                 extend: {
                     fontFamily: {
                         sans: ['Inter', 'sans-serif'],
+                    },
+                    keyframes: {
+                        fadeInUp: {
+                            '0%': { opacity: '0', transform: 'translateY(20px)' },
+                            '100%': { opacity: '1', transform: 'translateY(0)' },
+                        },
+                        popIn: {
+                            '0%': { opacity: '0', transform: 'scale(0.95) translateY(20px)' },
+                            '100%': { opacity: '1', transform: 'scale(1) translateY(0)' },
+                        }
+                    },
+                    animation: {
+                        'fade-in-up': 'fadeInUp 0.6s ease-out forwards',
+                        'pop-in': 'popIn 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards',
                     }
                 }
             }
@@ -22,13 +36,21 @@
     <style>
         /* Стили для кастомных радио-кнопок */
         .radio-label {
-            transition: all 0.2s ease;
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .radio-label:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
         }
         input[type="radio"]:checked + .radio-label {
             background-color: #2563eb; /* blue-600 */
             color: white;
             border-color: #2563eb;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            box-shadow: 0 6px 10px -2px rgba(37, 99, 235, 0.3);
+            transform: scale(1.03);
+        }
+        input[type="radio"]:active + .radio-label {
+            transform: scale(0.95);
         }
         html {
             scroll-behavior: smooth;
@@ -38,7 +60,7 @@
 <body class="bg-slate-50 text-slate-800 font-sans antialiased">
 
     <!-- Шапка -->
-    <header class="bg-white shadow-sm sticky top-0 z-50">
+    <header class="bg-white shadow-sm sticky top-0 z-50 animate-fade-in-up">
         <div class="max-w-4xl mx-auto px-4 py-4 md:py-6 flex justify-between items-center">
             <div>
                 <h1 class="text-xl md:text-2xl font-bold text-slate-900">Опросник KOOS</h1>
@@ -50,7 +72,7 @@
     <main class="max-w-4xl mx-auto px-4 py-8">
         
         <!-- Описание -->
-        <div class="bg-blue-50 border-l-4 border-blue-600 p-4 mb-8 rounded-r-lg">
+        <div class="bg-blue-50 border-l-4 border-blue-600 p-4 mb-8 rounded-r-lg opacity-0 animate-fade-in-up" style="animation-delay: 150ms;">
             <h2 class="font-semibold text-blue-800 mb-2">Инструкция</h2>
             <p class="text-sm text-blue-700">
                 Этот опросник поможет оценить состояние вашего колена. Отвечайте на вопросы, основываясь на ваших ощущениях <b>в течение прошедшей недели</b>. Выберите наиболее подходящий вариант ответа для каждого вопроса. Ответить необходимо на все вопросы для точного результата.
@@ -59,18 +81,18 @@
 
         <!-- Форма опросника -->
         <form id="koos-form" class="space-y-8">
-            <div id="questions-container"></div>
+            <div id="questions-container" class="space-y-8"></div>
 
             <!-- Кнопка отправки -->
-            <div class="flex justify-center pt-6 pb-12">
-                <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 px-10 rounded-xl shadow-lg transition duration-300 transform hover:-translate-y-1 w-full md:w-auto text-lg">
+            <div class="flex justify-center pt-6 pb-12 opacity-0 animate-fade-in-up" style="animation-delay: 900ms;">
+                <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 px-10 rounded-xl shadow-lg transition duration-300 transform hover:-translate-y-1 hover:shadow-xl w-full md:w-auto text-lg">
                     Рассчитать результаты
                 </button>
             </div>
         </form>
 
         <!-- Блок результатов (скрыт по умолчанию) -->
-        <div id="results-container" class="hidden mb-16">
+        <div id="results-container" class="hidden mb-16 animate-pop-in">
             <div class="bg-white rounded-2xl shadow-xl overflow-hidden">
                 <div class="bg-slate-900 px-6 py-8 text-white text-center">
                     <h2 class="text-3xl font-bold mb-2">Ваши результаты</h2>
@@ -189,10 +211,13 @@
             const container = document.getElementById('questions-container');
             let html = '';
 
-            koosData.forEach((section) => {
+            koosData.forEach((section, index) => {
+                // Добавляем задержку анимации для каждого следующего блока
+                const animDelay = 300 + (index * 150);
+                
                 html += `
-                <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
-                    <div class="bg-slate-50 border-b border-slate-200 px-6 py-4">
+                <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden opacity-0 animate-fade-in-up" style="animation-delay: ${animDelay}ms;">
+                    <div class="bg-slate-50 border-b border-slate-200 px-6 py-4 transition-colors">
                         <h2 class="text-xl font-bold text-slate-800">${section.title}</h2>
                         ${section.description ? `<p class="text-sm text-slate-500 mt-1">${section.description}</p>` : ''}
                     </div>
